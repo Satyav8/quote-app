@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quote Collector</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-4">
+  <h1>Quote Collector</h1>
+  <form id="quoteForm">
+    <input class="form-control my-2" id="author" placeholder="Author" required />
+    <input class="form-control my-2" id="text" placeholder="Quote" required />
+    <button class="btn btn-primary">Submit</button>
+  </form>
+  <ul class="list-group mt-4" id="quoteList"></ul>
+
+  <script>
+    const form = document.getElementById("quoteForm");
+    const quoteList = document.getElementById("quoteList");
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const data = {
+        author: document.getElementById("author").value,
+        text: document.getElementById("text").value
+      };
+      await fetch("/api/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      form.reset();
+      loadQuotes();
+    };
+
+    async function loadQuotes() {
+      const res = await fetch("/api/quotes");
+      const quotes = await res.json();
+      quoteList.innerHTML = quotes.map(q => `<li class="list-group-item"><strong>${q.author}:</strong> ${q.text}</li>`).join("");
+    }
+
+    loadQuotes();
+  </script>
+</body>
+</html>
